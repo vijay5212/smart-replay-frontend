@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ReplayTool AI</title>
+
+<style>
+    body {
+    font-family: 'Segoe UI', sans-serif;
+    background: url("bg3.jpg") no-repeat center center/cover;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+   body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* dark overlay */
+    z-index: 0;
+}
+
+.container {
+    position: relative;
+    z-index: 1;
+}
+    h1 {
+        margin-bottom: 10px;
+    }
+
+    textarea {
+        width: 100%;
+        height: 100px;
+        border-radius: 10px;
+        border: none;
+        padding: 10px;
+        font-size: 14px;
+        margin-bottom: 15px;
+    }
+
+    button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        background: #3b82f6;
+        color: white;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    button:hover {
+        background: #2563eb;
+        transform: scale(1.05);
+    }
+
+    .loader {
+        margin-top: 15px;
+        display: none;
+    }
+
+    .spinner {
+        border: 4px solid rgba(255,255,255,0.2);
+        border-top: 4px solid #3b82f6;
+        border-radius: 50%;
+        width: 35px;
+        height: 35px;
+        animation: spin 1s linear infinite;
+        margin: auto;
+    }
+
+    @keyframes spin {
+        100% { transform: rotate(360deg); }
+    }
+
+    .result {
+        margin-top: 20px;
+        text-align: left;
+    }
+
+    .reply-box {
+        background: #0f172a;
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        animation: fadeIn 0.5s ease-in;
+    }
+
+    .copy-btn {
+        background: #3a9ed4;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        color: white;
+    }
+    .logo {
+    width: 72px;
+    height: 72px;
+    border-radius: 30px;
+    box-shadow: 0 0 10px rgba(0, 200, 255, 0.6);
+    }
+
+    @keyframes fadeIn {
+        from {opacity: 0; transform: translateY(10px);}
+        to {opacity: 1; transform: translateY(0);}
+    }
+    .header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.header h1 {
+    font-size: 26px;
+    margin: 0;
+    font-weight: 600;
+}
+
+/* FIX LOGO SIZE */
+.logo {
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(0, 200, 255, 0.6);
+}
+
+</style>
+</head>
+
+<body>
+<img src="" class="bg-girl">
+<div class="container">
+    <div class="header">
+    <img src="icon.webp" class="logo">
+    <h1>AtoZ SmartReplay AI</h1>
+</div>
+    <p>Professional Customer Support Reply Generator</p>
+
+    <textarea id="inputText" placeholder="Enter client message..."></textarea>
+<center>
+    <button onclick="generateReply()">Generate Reply</button>
+</center>
+    <div class="loader" id="loader">
+        <div class="spinner"></div>
+        <p>Generating reply...</p>
+    </div>
+
+    <div class="result" id="result"></div>
+</div>
+
+<script>
+async function generateReply() {
+    const text = document.getElementById("inputText").value;
+    const loader = document.getElementById("loader");
+    const resultDiv = document.getElementById("result");
+
+    resultDiv.innerHTML = "";
+    loader.style.display = "block";
+
+    try {
+        const response = await fetch("https://smart-reply-ai-4.onrender.com/api/rewrite", {
+            method: "POST",
+            headers: {
+                "Content-Type": "text/plain"
+            },
+            body: text
+        });
+
+        const data = await response.text();
+
+        loader.style.display = "none";
+
+        // Split replies into lines
+        const lines = data.split("\n").filter(line => line.trim() !== "");
+
+        lines.forEach(line => {
+            const div = document.createElement("div");
+            div.className = "reply-box";
+
+            const span = document.createElement("span");
+            span.innerText = line;
+
+            const btn = document.createElement("button");
+            btn.innerText = "Copy";
+            btn.className = "copy-btn";
+
+            btn.onclick = () => {
+                navigator.clipboard.writeText(line);
+                btn.innerText = "Copied!";
+                setTimeout(() => btn.innerText = "Copy", 1500);
+            };
+
+            div.appendChild(span);
+            div.appendChild(btn);
+
+            resultDiv.appendChild(div);
+        });
+
+    } catch (error) {
+        loader.style.display = "none";
+        resultDiv.innerHTML = "Error: " + error;
+    }
+}
+</script>
+
+</body>
+</html>
