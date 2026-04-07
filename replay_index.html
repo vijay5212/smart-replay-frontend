@@ -279,7 +279,7 @@ async function generateReply() {
             div.className = "reply-box";
 
             const span = document.createElement("span");
-            typeEffect(line, span);
+            span.innerText = line;
 
             const btn = document.createElement("button");
             btn.innerText = "Copy";
